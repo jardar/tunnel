@@ -2,9 +2,11 @@ package tunnel
 
 import (
 	"bufio"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
 	"sync"
@@ -431,7 +433,16 @@ func (c *Client) isRetry(state ClientState) bool {
 func (c *Client) connect(identifier, serverAddr string) error {
 	c.log.Debug("Trying to connect to %q with identifier %q", serverAddr, identifier)
 
-	conn, err := c.dial(serverAddr)
+	/**
+	 * 改成 可用 TLS
+	 */
+	conf := &tls.Config{
+		InsecureSkipVerify: true,
+	}
+	log.Println("before dial ssl")
+	conn, err := tls.Dial("tcp", serverAddr, conf)
+
+	// conn, err := c.dial(serverAddr)
 	if err != nil {
 		return err
 	}
